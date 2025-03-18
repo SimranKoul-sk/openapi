@@ -73,6 +73,9 @@ components:
           type: string
         source:
           type: string
+          enum:
+           - black
+           - white  
         id:
           type: string
         time:
