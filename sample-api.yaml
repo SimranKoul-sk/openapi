@@ -18,7 +18,7 @@ paths:
             schema:
               type: object
               properties:
-                specversion:
+                volatile:
                   type: string
                   example: "1.0"
                 type:
@@ -40,7 +40,7 @@ paths:
                   example:
                     key: "value"
               required:
-                - specversion
+                - volatile
                 - type
                 - source
                 - id
@@ -67,7 +67,7 @@ components:
     CloudEvent:
       type: object
       properties:
-        specversion:
+        volatile:
           type: string
         type:
           type: string
