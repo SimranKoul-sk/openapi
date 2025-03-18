@@ -83,7 +83,7 @@ components:
           additionalProperties: true
 
     # Event Type 1: QoS Status Changed Event
-    org.camaraproject.qod.qos-status-changed-event:
+    org.camaraproject.qod.v0.1.qos-status-changed-event:
       type: object
       properties:
         status:
@@ -104,6 +104,8 @@ components:
             affectedServices:
               - "Service A"
               - "Service B"
+      discriminator:
+        propertyName: "type"
 
     # Event Type 2: System Health Event
     org.camaraproject.qod.system-health-event:
