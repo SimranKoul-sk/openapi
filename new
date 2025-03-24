@@ -1,0 +1,80 @@
+openapi: 3.0.0
+info:
+  title: Dynamic Event Processor
+  version: 1.0.0
+paths:
+  /events:
+    post:
+      summary: Process events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudEvent'
+      responses:
+        '200':
+          description: Event processed successfully
+        '400':
+          description: Invalid event
+        '500':
+          description: Server error
+components:
+  schemas:
+    CloudEvent:
+      type: object
+      properties:
+        specversion:
+          type: string
+        type:
+          type: string
+        source:
+          type: string
+        id:
+          type: string
+        time:
+          type: string
+        datacontenttype:
+          type: string
+        data:
+          type: object
+      discriminator:
+        propertyName: type
+      oneOf:
+        - $ref: '#/components/schemas/org_camaraproject_qod_v0_1_user_login_event'
+        - $ref: '#/components/schemas/org_camaraproject_detail_event'
+        - $ref: '#/components/schemas/local_var_files'
+    org_camaraproject_qod_v0_1_user_login_event:
+      type: object
+      properties:
+        username:
+          type: string
+        loginTimestamp:
+          type: string
+          format: date-time
+      required:
+        - username
+        - loginTimestamp
+    org_camaraproject_detail_event:
+      type: object
+      properties:
+        eventDetail:
+          type: string
+        description:
+          type: string
+      required:
+        - eventDetail
+        - description
+    local_var_files:
+      type: object
+      properties:
+        fileName:
+          type: string
+        filePath:
+          type: string
+        fileSize:
+          type: integer
+      required:
+        - fileName
+        - filePath
+        - fileSize
+ 
