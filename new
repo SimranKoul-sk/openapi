@@ -40,10 +40,10 @@ components:
       discriminator:
         propertyName: type
       oneOf:
-        - $ref: '#/components/schemas/org_camaraproject_qod_v0_1_user_login_event'
-        - $ref: '#/components/schemas/org_camaraproject_detail_event'
+        - $ref: '#/components/schemas/org.camaraproject.qod.v0.1.user-login-event'
+        - $ref: '#/components/schemas/org.camaraproject.detail-event'
         - $ref: '#/components/schemas/local_var_files'
-    org_camaraproject_qod_v0_1_user_login_event:
+    org.camaraproject.qod.v0.1.user-login-event:
       type: object
       properties:
         username:
@@ -54,7 +54,7 @@ components:
       required:
         - username
         - loginTimestamp
-    org_camaraproject_detail_event:
+    org.camaraproject.detail-event:
       type: object
       properties:
         eventDetail:
@@ -77,4 +77,3 @@ components:
         - fileName
         - filePath
         - fileSize
- 
