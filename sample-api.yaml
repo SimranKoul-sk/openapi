@@ -66,6 +66,8 @@ components:
   schemas:
     CloudEvent:
       type: object
+      discriminator:
+        propertyName: "type"
       properties:
         specversion:
           type: string
@@ -104,8 +106,6 @@ components:
             affectedServices:
               - "Service A"
               - "Service B"
-      discriminator:
-        propertyName: "type"
 
     # Event Type 2: System Health Event
     org.camaraproject.qod.system-health-event:
