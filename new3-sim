@@ -1,0 +1,123 @@
+openapi: 3.0.1
+info:
+  title: Camara Project Subscription API
+  description: API for subscribing to CloudEvents notifications.
+  version: 1.0.0
+
+paths:
+  /subscribe:
+    post:
+      summary: Subscribe to events
+      operationId: subscribeToEvents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionRequest'
+      responses:
+        '200':
+          description: Subscription successful
+        '400':
+          description: Bad request
+
+components:
+  schemas:
+    CloudEvent:
+      type: object
+      required:
+        - specversion
+        - id
+        - source
+        - time
+        - type
+      properties:
+        specversion:
+          type: string
+          description: The version of the CloudEvents specification being used.
+        id:
+          type: string
+          description: The unique identifier for the event.
+        source:
+          type: string
+          description: The source of the event.
+        time:
+          type: string
+          format: date-time
+          description: The timestamp when the event was generated.
+        type:
+          type: string
+          description: Event type (discriminator).
+      oneOf:
+        - $ref: '#/components/schemas/org.camaraproject.api-name.v0.event-type1'
+        - $ref: '#/components/schemas/org.camaraproject.api-name.v0.event-type2'
+        - $ref: '#/components/schemas/org.camaraproject.api-name.v0.subscription-ends'
+
+    # Define event types as schemas corresponding to the event type strings
+    org.camaraproject.api-name.v0.event-type1:
+      type: object
+      required:
+        - eventdetail
+      properties:
+        eventdetail:
+          type: object
+          required:
+            - property1
+            - property2
+          properties:
+            property1:
+              type: string
+              description: A specific property for event type 1.
+            property2:
+              type: integer
+              description: Another specific property for event type 1.
+
+    org.camaraproject.api-name.v0.event-type2:
+      type: object
+      required:
+        - eventdetail
+      properties:
+        eventdetail:
+          type: object
+          required:
+            - propertyA
+            - propertyB
+          properties:
+            propertyA:
+              type: string
+              description: A specific property for event type 2.
+            propertyB:
+              type: boolean
+              description: Another specific property for event type 2.
+
+    org.camaraproject.api-name.v0.subscription-ends:
+      type: object
+      required:
+        - eventdetail
+      properties:
+        eventdetail:
+          type: object
+          required:
+            - reason
+          properties:
+            reason:
+              type: string
+              description: The reason for the subscription ending.
+
+    SubscriptionRequest:
+      type: object
+      required:
+        - webhookUrl
+        - type
+      properties:
+        webhookUrl:
+          type: string
+          description: The URL to which notifications will be sent.
+        type:
+          type: string
+          description: Type of event the user wants to subscribe to.
+      oneOf:
+        - $ref: '#/components/schemas/org.camaraproject.api-name.v0.event-type1'
+        - $ref: '#/components/schemas/org.camaraproject.api-name.v0.event-type2'
+        - $ref: '#/components/schemas/org.camaraproject.api-name.v0.subscription-ends'
+ 
