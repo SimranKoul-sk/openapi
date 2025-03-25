@@ -51,7 +51,7 @@ components:
       oneOf:
         - $ref: '#/components/schemas/org.camaraproject.api-name.v0.event-type1'
         - $ref: '#/components/schemas/org.camaraproject.api-name.v0.event-type2'
-        - $ref: '#/components/schemas/org.camaraproject.api-name.v0.subscription-ends'
+        - $ref: '#/components/schemas/org.camaraproject.api-name.subscription-ends'
 
     # Define event types as schemas corresponding to the event type strings
     org.camaraproject.api-name.v0.event-type1:
@@ -90,7 +90,7 @@ components:
               type: boolean
               description: Another specific property for event type 2.
 
-    org.camaraproject.api-name.v0.subscription-ends:
+    org.camaraproject.api-name.subscription-ends:
       type: object
       required:
         - eventdetail
@@ -119,5 +119,5 @@ components:
       oneOf:
         - $ref: '#/components/schemas/org.camaraproject.api-name.v0.event-type1'
         - $ref: '#/components/schemas/org.camaraproject.api-name.v0.event-type2'
-        - $ref: '#/components/schemas/org.camaraproject.api-name.v0.subscription-ends'
+        - $ref: '#/components/schemas/org.camaraproject.api-name.subscription-ends'
  
