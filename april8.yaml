@@ -1,0 +1,247 @@
+openapi: 3.0.3
+info:
+  title: Generic Python Cloud Event SDK
+  description: |
+    This SDK is designed to handle CloudEvents generically across different platforms, minimizing redundancy, and avoiding the need for recompilation when new events are added or removed.
+    It integrates with the CloudEvents Open Source project to provide seamless event handling, supporting multiple programming languages and frameworks.
+  version: 1.0.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://api.example.com/v1
+    description: Main API Server for CloudEvent Integration
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/auth
+          tokenUrl: https://example.com/token
+
+  headers:
+    x-correlator:
+      description: Correlation ID for tracing across services.
+      schema:
+        type: string
+        pattern: "^[a-zA-Z0-9-]{0,55}$"
+
+  parameters:
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation ID for tracing across services.
+      schema:
+        type: string
+        pattern: "^[a-zA-Z0-9-]{0,55}$"
+      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+
+  schemas:
+    CloudEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique event identifier.
+        source:
+          type: string
+          description: Source of the event.
+        type:
+          type: string
+          description: Type of the event.
+        time:
+          type: string
+          format: date-time
+          description: Time of the event.
+        data:
+          type: object
+          description: Payload or data associated with the event.
+      required:
+        - id
+        - source
+        - type
+        - time
+        - data
+
+    ErrorInfo:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+        code:
+          type: string
+      required:
+        - message
+        - status
+        - code
+
+    Device:
+      type: object
+      properties:
+        phoneNumber:
+          $ref: "#/components/schemas/PhoneNumber"
+        ipv4Address:
+          $ref: "#/components/schemas/Ipv4Address"
+        ipv6Address:
+          $ref: "#/components/schemas/Ipv6Address"
+        deviceType:
+          type: string
+          example: "Smartphone"
+      required:
+        - phoneNumber
+
+    PhoneNumber:
+      type: string
+      pattern: "^\+[1-9][0-9]{4,14}$"
+      example: "+123456789"
+
+    Ipv4Address:
+      type: string
+      format: ipv4
+      example: "192.168.1.1"
+
+    Ipv6Address:
+      type: string
+      format: ipv6
+      example: "2001:db8::ff00:42:8329"
+
+  responses:
+    Generic400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+
+    Generic500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorInfo"
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+
+paths:
+  /events:
+    get:
+      summary: Get CloudEvents
+      operationId: getCloudEvents
+      tags:
+        - CloudEvent
+      parameters:
+        - $ref: "#/components/parameters/x-correlator"
+      responses:
+        200:
+          description: Successfully retrieved events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CloudEvent"
+        400:
+          $ref: "#/components/responses/Generic400"
+        500:
+          $ref: "#/components/responses/Generic500"
+
+  /event/{id}:
+    get:
+      summary: Get a specific CloudEvent by ID
+      operationId: getCloudEventById
+      tags:
+        - CloudEvent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the event to retrieve
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully retrieved the event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudEvent"
+        400:
+          $ref: "#/components/responses/Generic400"
+        500:
+          $ref: "#/components/responses/Generic500"
+
+  /event:
+    post:
+      summary: Create a new CloudEvent
+      operationId: createCloudEvent
+      tags:
+        - CloudEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloudEvent"
+      responses:
+        201:
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloudEvent"
+        400:
+          $ref: "#/components/responses/Generic400"
+        500:
+          $ref: "#/components/responses/Generic500"
+
+  /event/{id}:
+    delete:
+      summary: Delete a CloudEvent by ID
+      operationId: deleteCloudEvent
+      tags:
+        - CloudEvent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the event to delete
+          schema:
+            type: string
+      responses:
+        204:
+          description: Event deleted successfully
+        400:
+          $ref: "#/components/responses/Generic400"
+        500:
+          $ref: "#/components/responses/Generic500"
+
+x-client-generation:
+  - language: python
+    generator: openapi-generator
+    options:
+      additionalProperties:
+        useCloudEventSDK: true
+  - language: java
+    generator: openapi-generator
+    options:
+      additionalProperties:
+        useCloudEventSDK: true
+  - language: javascript
+    generator: openapi-generator
+    options:
+      additionalProperties:
+        useCloudEventSDK: true
+  - language: go
+    generator: openapi-generator
+    options:
+      additionalProperties:
+        useCloudEventSDK: true
