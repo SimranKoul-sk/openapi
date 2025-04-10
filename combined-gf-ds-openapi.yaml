@@ -1,0 +1,348 @@
+openapi: 3.0.3
+info:
+  title: Combined DS and GF Server Subscription API
+  description: This specification combines subscription endpoints from the DS Server and GF Server APIs
+  version: 1.0.0
+paths:
+  /subscriptions:
+    post:
+      tags:
+        - Subscriptions
+      summary: Create a new subscription
+      description: Creates a new subscription for data services
+      operationId: createSubscription
+      requestBody:
+        description: Subscription details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionRequest'
+      responses:
+        '201':
+          description: Subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - Subscriptions
+      summary: List all subscriptions
+      description: Returns a list of all subscriptions
+      operationId: listSubscriptions
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+  /subscriptions/{id}:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get subscription by ID
+      description: Returns a single subscription by ID
+      operationId: getSubscription
+      parameters:
+        - name: id
+          in: path
+          description: Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Subscriptions
+      summary: Delete subscription
+      description: Deletes a subscription by ID
+      operationId: deleteSubscription
+      parameters:
+        - name: id
+          in: path
+          description: Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Subscription deleted successfully
+        '404':
+          description: Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /gf/subscriptions:
+    post:
+      tags:
+        - GF Subscriptions
+      summary: Create a new GF subscription
+      description: Creates a new subscription for GF services
+      operationId: createGFSubscription
+      requestBody:
+        description: GF Subscription details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GFSubscriptionRequest'
+      responses:
+        '201':
+          description: GF Subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GFSubscription'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - GF Subscriptions
+      summary: List all GF subscriptions
+      description: Returns a list of all GF subscriptions
+      operationId: listGFSubscriptions
+      responses:
+        '200':
+          description: List of GF subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GFSubscription'
+  /gf/subscriptions/{id}:
+    get:
+      tags:
+        - GF Subscriptions
+      summary: Get GF subscription by ID
+      description: Returns a single GF subscription by ID
+      operationId: getGFSubscription
+      parameters:
+        - name: id
+          in: path
+          description: GF Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: GF Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GFSubscription'
+        '404':
+          description: GF Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - GF Subscriptions
+      summary: Delete GF subscription
+      description: Deletes a GF subscription by ID
+      operationId: deleteGFSubscription
+      parameters:
+        - name: id
+          in: path
+          description: GF Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: GF Subscription deleted successfully
+        '404':
+          description: GF Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    SubscriptionRequest:
+      type: object
+      required:
+        - name
+        - dataType
+        - frequency
+      properties:
+        name:
+          type: string
+          description: Name of the subscription
+        dataType:
+          type: string
+          description: Type of data being subscribed to
+          enum:
+            - MARKET_DATA
+            - REFERENCE_DATA
+            - ANALYTICS
+        frequency:
+          type: string
+          description: Frequency of data delivery
+          enum:
+            - REAL_TIME
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+        filters:
+          type: object
+          description: Optional filters for the subscription
+        deliveryMethod:
+          type: string
+          description: Method for delivering the data
+          enum:
+            - API
+            - EMAIL
+            - FTP
+    Subscription:
+      allOf:
+        - $ref: '#/components/schemas/SubscriptionRequest'
+        - type: object
+          required:
+            - id
+            - createdAt
+            - status
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the subscription
+            createdAt:
+              type: string
+              format: date-time
+              description: Date and time when the subscription was created
+            updatedAt:
+              type: string
+              format: date-time
+              description: Date and time when the subscription was last updated
+            status:
+              type: string
+              description: Current status of the subscription
+              enum:
+                - ACTIVE
+                - INACTIVE
+                - PENDING
+                - CANCELLED
+    GFSubscriptionRequest:
+      type: object
+      required:
+        - name
+        - productType
+        - deliverySchedule
+      properties:
+        name:
+          type: string
+          description: Name of the GF subscription
+        productType:
+          type: string
+          description: Type of GF product being subscribed to
+          enum:
+            - RISK_METRICS
+            - ESG_DATA
+            - PORTFOLIO_ANALYTICS
+        deliverySchedule:
+          type: string
+          description: Schedule for data delivery
+          enum:
+            - REAL_TIME
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - QUARTERLY
+        parameters:
+          type: object
+          description: Additional parameters for the subscription
+        notificationSettings:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              description: Whether notifications are enabled
+            channels:
+              type: array
+              items:
+                type: string
+                enum:
+                  - EMAIL
+                  - SMS
+                  - WEBHOOK
+              description: Notification channels
+    GFSubscription:
+      allOf:
+        - $ref: '#/components/schemas/GFSubscriptionRequest'
+        - type: object
+          required:
+            - id
+            - createdAt
+            - status
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the GF subscription
+            createdAt:
+              type: string
+              format: date-time
+              description: Date and time when the GF subscription was created
+            updatedAt:
+              type: string
+              format: date-time
+              description: Date and time when the GF subscription was last updated
+            status:
+              type: string
+              description: Current status of the GF subscription
+              enum:
+                - ACTIVE
+                - INACTIVE
+                - PENDING
+                - CANCELLED
+            lastDelivery:
+              type: string
+              format: date-time
+              description: Date and time of the last data delivery
+            nextDelivery:
+              type: string
+              format: date-time
+              description: Expected date and time of the next data delivery
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+        details:
+          type: object
+          description: Additional error details
