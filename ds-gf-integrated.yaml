@@ -1,0 +1,556 @@
+openapi: 3.0.0
+info:
+  title: Combined DS and GF Server Subscription API
+  description: API for managing both regular subscriptions and GF subscriptions
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /subscriptions:
+    get:
+      tags:
+        - subscriptions
+      summary: List all subscriptions
+      description: Returns a list of all subscriptions
+      operationId: list_subscriptions
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server.controllers.subscriptions_controller
+    post:
+      tags:
+        - subscriptions
+      summary: Create a new subscription
+      description: Creates a new subscription for data services
+      operationId: create_subscription
+      requestBody:
+        description: Subscription details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server.controllers.subscriptions_controller
+  /subscriptions/{id}:
+    get:
+      tags:
+        - subscriptions
+      summary: Get subscription by ID
+      description: Returns a single subscription by ID
+      operationId: get_subscription
+      parameters:
+        - name: id
+          in: path
+          description: Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server.controllers.subscriptions_controller
+    delete:
+      tags:
+        - subscriptions
+      summary: Delete subscription
+      description: Deletes a subscription by ID
+      operationId: delete_subscription
+      parameters:
+        - name: id
+          in: path
+          description: Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server.controllers.subscriptions_controller
+  /gf/subscriptions:
+    get:
+      tags:
+        - gf-subscriptions
+      summary: List all GF subscriptions
+      description: Returns a list of all GF subscriptions
+      operationId: list_gf_subscriptions
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GFSubscription'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server.controllers.gf_subscriptions_controller
+    post:
+      tags:
+        - gf-subscriptions
+      summary: Create a new GF subscription
+      description: Creates a new subscription for GF services
+      operationId: create_gf_subscription
+      requestBody:
+        description: GF Subscription details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GFSubscriptionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GFSubscription'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server.controllers.gf_subscriptions_controller
+  /gf/subscriptions/{id}:
+    get:
+      tags:
+        - gf-subscriptions
+      summary: Get GF subscription by ID
+      description: Returns a single GF subscription by ID
+      operationId: get_gf_subscription
+      parameters:
+        - name: id
+          in: path
+          description: GF Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GFSubscription'
+        '404':
+          description: GF Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server.controllers.gf_subscriptions_controller
+    delete:
+      tags:
+        - gf-subscriptions
+      summary: Delete GF subscription
+      description: Deletes a GF subscription by ID
+      operationId: delete_gf_subscription
+      parameters:
+        - name: id
+          in: path
+          description: GF Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: GF Subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server.controllers.gf_subscriptions_controller
+
+  # Combined endpoints
+  /all-subscriptions:
+    get:
+      tags:
+        - combined
+      summary: List all subscriptions of multiple types
+      description: Get a combined list of regular subscriptions and GF subscriptions in a single API call
+      operationId: list_all_subscriptions
+      parameters:
+        - name: include_regular
+          in: query
+          description: Whether to include regular subscriptions in the response
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: include_gf
+          in: query
+          description: Whether to include GF subscriptions in the response
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CombinedSubscriptionsResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server_2.controllers.combined_subscriptions_controller
+    post:
+      tags:
+        - combined
+      summary: Create multiple subscriptions in a single request
+      description: Creates both regular and GF subscriptions in a single API call
+      operationId: create_combined_subscriptions
+      requestBody:
+        description: Combined subscription details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CombinedSubscriptionsRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CombinedSubscriptionsCreationResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server_2.controllers.combined_subscriptions_controller
+  
+  /all-subscriptions/{id}:
+    get:
+      tags:
+        - combined
+      summary: Get both regular and GF subscription by ID
+      description: Returns both a regular subscription and a GF subscription with the same ID if they exist
+      operationId: get_combined_subscription
+      parameters:
+        - name: id
+          in: path
+          description: Subscription ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CombinedSubscriptionByIdResponse'
+        '404':
+          description: No subscriptions found with this ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server_2.controllers.combined_subscriptions_controller
+    delete:
+      tags:
+        - combined
+      summary: Delete both regular and GF subscriptions by ID
+      description: Deletes both a regular subscription and a GF subscription with the same ID
+      operationId: delete_combined_subscription
+      parameters:
+        - name: id
+          in: path
+          description: Subscription ID
+          required: true
+          schema:
+            type: string
+        - name: delete_regular
+          in: query
+          description: Whether to delete the regular subscription
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: delete_gf
+          in: query
+          description: Whether to delete the GF subscription
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CombinedDeleteResponse'
+        '404':
+          description: No matching subscriptions found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: openapi_server_2.controllers.combined_subscriptions_controller
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        dataType:
+          type: string
+          enum:
+            - MARKET_DATA
+            - ANALYTICS
+            - REFERENCE_DATA
+        filters:
+          type: string
+        frequency:
+          type: string
+          enum:
+            - REAL_TIME
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+        deliveryMethod:
+          type: string
+          enum:
+            - API
+            - EMAIL
+            - SFTP
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    SubscriptionRequest:
+      type: object
+      required:
+        - name
+        - dataType
+        - frequency
+        - deliveryMethod
+      properties:
+        name:
+          type: string
+        dataType:
+          type: string
+          enum:
+            - MARKET_DATA
+            - ANALYTICS
+            - REFERENCE_DATA
+        filters:
+          type: string
+          default: '{}'
+        frequency:
+          type: string
+          enum:
+            - REAL_TIME
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+        deliveryMethod:
+          type: string
+          enum:
+            - API
+            - EMAIL
+            - SFTP
+    GFSubscription:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        productType:
+          type: string
+          enum:
+            - RISK_METRICS
+            - ASSET_TRACKING
+            - BOUNDARY_ALERTS
+        parameters:
+          type: string
+        deliverySchedule:
+          type: string
+          enum:
+            - REAL_TIME
+            - HOURLY
+            - DAILY
+            - WEEKLY
+        notificationSettings:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            channels:
+              type: array
+              items:
+                type: string
+                enum:
+                  - EMAIL
+                  - SMS
+                  - PUSH
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    GFSubscriptionRequest:
+      type: object
+      required:
+        - name
+        - productType
+        - deliverySchedule
+      properties:
+        name:
+          type: string
+        productType:
+          type: string
+          enum:
+            - RISK_METRICS
+            - ASSET_TRACKING
+            - BOUNDARY_ALERTS
+        parameters:
+          type: string
+          default: '{}'
+        deliverySchedule:
+          type: string
+          enum:
+            - REAL_TIME
+            - HOURLY
+            - DAILY
+            - WEEKLY
+        notificationSettings:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              default: true
+            channels:
+              type: array
+              items:
+                type: string
+                enum:
+                  - EMAIL
+                  - SMS
+                  - PUSH
+    CombinedSubscriptionsResponse:
+      type: object
+      properties:
+        subscriptions:
+          type: array
+          description: List of regular subscriptions
+          items:
+            $ref: '#/components/schemas/Subscription'
+        gfSubscriptions:
+          type: array
+          description: List of GF subscriptions
+          items:
+            $ref: '#/components/schemas/GFSubscription'
+
+    # New schemas for combined operations
+    CombinedSubscriptionsRequest:
+      type: object
+      properties:
+        regularSubscription:
+          $ref: '#/components/schemas/SubscriptionRequest'
+          description: Regular subscription to create
+        gfSubscription:
+          $ref: '#/components/schemas/GFSubscriptionRequest'
+          description: GF subscription to create
+    
+    CombinedSubscriptionsCreationResponse:
+      type: object
+      properties:
+        regularSubscription:
+          $ref: '#/components/schemas/Subscription'
+          description: Created regular subscription
+        gfSubscription:
+          $ref: '#/components/schemas/GFSubscription'
+          description: Created GF subscription
+    
+    CombinedSubscriptionByIdResponse:
+      type: object
+      properties:
+        regularSubscription:
+          $ref: '#/components/schemas/Subscription'
+          description: Regular subscription with the requested ID
+        gfSubscription:
+          $ref: '#/components/schemas/GFSubscription'
+          description: GF subscription with the requested ID
+    
+    CombinedDeleteResponse:
+      type: object
+      properties:
+        regularSubscriptionDeleted:
+          type: boolean
+          description: Whether a regular subscription was deleted
+        gfSubscriptionDeleted:
+          type: boolean
+          description: Whether a GF subscription was deleted
